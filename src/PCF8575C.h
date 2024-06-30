@@ -83,8 +83,8 @@
 /// </pre>
 
 
-#ifndef I2C_DISCRETE_IO_EXPANDER_H
-#define I2C_DISCRETE_IO_EXPANDER_H
+#ifndef PCF8575C_H
+#define PCF8575C_H
 
 
 // _________________________________________________________ STANDARD INCLUDES
@@ -102,32 +102,33 @@
 
 // _________________________________________________________________ CONSTANTS
 /// I2C/TWI success (transaction was successful).
-/// \relates I2cDiscreteIoExpander
+/// \relates PCF8575C
 static const uint8_t TWI_SUCCESS      = 0;
 
 
 /// I2C/TWI device not present (address sent, NACK received).
-/// \relates I2cDiscreteIoExpander
+/// \relates PCF8575C
 static const uint8_t TWI_DEVICE_NACK  = 2;
 
 
 /// I2C/TWI data not received (data sent, NACK received).
-/// \relates I2cDiscreteIoExpander
+/// \relates PCF8575C
 static const uint8_t TWI_DATA_NACK    = 3;
 
 
 /// I2C/TWI other error.
-/// \relates I2cDiscreteIoExpander
+/// \relates PCF8575C
 static const uint8_t TWI_ERROR        = 4;
 
 
 // _________________________________________________________ CLASS DEFINITIONS
-class I2cDiscreteIoExpander
+class PCF8575C
 {
   public:
     // ............................................... public member functions
-    I2cDiscreteIoExpander(uint8_t);
-    I2cDiscreteIoExpander();
+    PCF8575C(uint8_t);
+    PCF8575C();
+    uint8_t  begin(uint8_t);
     uint8_t  digitalRead();
     uint8_t  digitalWrite(uint16_t);
     uint8_t  getAddress();
@@ -151,7 +152,7 @@ class I2cDiscreteIoExpander
     /// Device address as defined by pins A2, A1, A0.
     uint8_t address_;
 
-    /// Storage object for I2cDiscreteIoExpander ports 1 (P17..P10), 0 (P07..P00).
+    /// Storage object for PCF8575C ports 1 (P17..P10), 0 (P07..P00).
     uint16_t ports_;
 
     /// Flag indicating whether bits are to be inverted before read/write (false=don't invert, true=invert).

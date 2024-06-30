@@ -1,9 +1,9 @@
 /*
 
-  I2cDiscreteIoExpander.cpp - Arduino library for TI PCF8575C 16-bit I2C
+  PCF8575C.cpp - Arduino library for TI PCF8575C 16-bit I2C
   I/O expander.
 
-  Library:: I2cDiscreteIoExpander
+  Library:: PCF8575C
   Author:: Doc Walker <4-20ma@wvfans.net>
 
   Copyright:: 2009-2016 Doc Walker
@@ -24,44 +24,44 @@
 
 
 // __________________________________________________________ PROJECT INCLUDES
-#include "I2cDiscreteIoExpander.h"
+#include "PCF8575C.h"
 
 
 // ___________________________________________________ PUBLIC MEMBER FUNCTIONS
 /// Constructor.
 /// Assigns device address, resets storage object, enables bitwise inversion.
-/// \required Call this to construct I2cDiscreteIoExpander object.
+/// \required Call this to construct PCF8575C object.
 /// \par Usage:
 /// \code
-/// ...
-/// I2cDiscreteIoExpander exampleA(1);             // device with address 1
-/// I2cDiscreteIoExpander exampleB[2] = { 2, 3 };  // devices with addresses 2, 3
-/// I2cDiscreteIoExpander exampleC[2] = { I2cDiscreteIoExpander(4), I2cDiscreteIoExpander(5) }; // alternate constructor syntax; devices with addresses 4, 5
-/// I2cDiscreteIoExpander exampleD[8] = { 0, 1, 2, 3, 4, 5, 6, 7 }; // addresses 0..7
-/// ...
 /// \endcode
-I2cDiscreteIoExpander::I2cDiscreteIoExpander(uint8_t address)
+PCF8575C::PCF8575C(uint8_t address)
 {
-  address_ = address & 0b111;
+  address_ = address;
   ports_ = 0;
   shouldInvert_ = true;
 }
 
 
-/// \overload I2cDiscreteIoExpander::I2cDiscreteIoExpander(uint8_t address)
+/// \overload PCF8575C::PCF8575C(uint8_t address)
 /// Constructor.
 /// Assigns device address, resets storage object, enables bitwise inversion.
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;        // implies device address 0
+/// PCF8575C device;        // implies device address 0
 /// ...
 /// \endcode
-I2cDiscreteIoExpander::I2cDiscreteIoExpander()
+PCF8575C::PCF8575C()
 {
-  address_ = 0;
   ports_ = 0;
   shouldInvert_ = true;
+}
+
+PCF8575C::begin(uint8_t address)
+{
+  address_ = address;
+  //Return status of test read
+  return digitalRead();
 }
 
 
@@ -75,7 +75,7 @@ I2cDiscreteIoExpander::I2cDiscreteIoExpander()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// uint8_t status = device.digitalRead();
 /// if (TWI_SUCCESS == status)
@@ -84,7 +84,7 @@ I2cDiscreteIoExpander::I2cDiscreteIoExpander()
 /// }
 /// ...
 /// \endcode
-uint8_t I2cDiscreteIoExpander::digitalRead()
+uint8_t PCF8575C::digitalRead()
 {
   uint8_t hi, lo, status;
   
@@ -120,7 +120,7 @@ uint8_t I2cDiscreteIoExpander::digitalRead()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// uint8_t status = device.digitalWrite(0xFFFF);
 /// if (TWI_SUCCESS == status)
@@ -129,7 +129,7 @@ uint8_t I2cDiscreteIoExpander::digitalRead()
 /// }
 /// ...
 /// \endcode
-uint8_t I2cDiscreteIoExpander::digitalWrite(uint16_t ports)
+uint8_t PCF8575C::digitalWrite(uint16_t ports)
 {
   ports_ = shouldInvert_ ? ~ports : ports;
   Wire.beginTransmission(BASE_ADDRESS_ | address_);
@@ -148,12 +148,12 @@ uint8_t I2cDiscreteIoExpander::digitalWrite(uint16_t ports)
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// address = device.getAddress();
 /// ...
 /// \endcode
-uint8_t I2cDiscreteIoExpander::getAddress()
+uint8_t PCF8575C::getAddress()
 {
   return address_;
 }
@@ -165,12 +165,12 @@ uint8_t I2cDiscreteIoExpander::getAddress()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// ports = device.getPorts();
 /// ...
 /// \endcode
-uint16_t I2cDiscreteIoExpander::getPorts()
+uint16_t PCF8575C::getPorts()
 {
   return ports_;
 }
@@ -181,14 +181,14 @@ uint16_t I2cDiscreteIoExpander::getPorts()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// device.enableBitwiseInversion();      // bits will now inverted
 /// ...
 /// \endcode
-/// \sa I2cDiscreteIoExpander::disableBitwiseInversion()
-/// \sa I2cDiscreteIoExpander::isInverted()
-void I2cDiscreteIoExpander::enableBitwiseInversion()
+/// \sa PCF8575C::disableBitwiseInversion()
+/// \sa PCF8575C::isInverted()
+void PCF8575C::enableBitwiseInversion()
 {
   ports_ = shouldInvert_ ? ports_ : ~ports_;
   shouldInvert_ = true;
@@ -200,14 +200,14 @@ void I2cDiscreteIoExpander::enableBitwiseInversion()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// device.disableBitwiseInversion();     // bits will no longer be inverted
 /// ...
 /// \endcode
-/// \sa I2cDiscreteIoExpander::enableBitwiseInversion()
-/// \sa I2cDiscreteIoExpander::isInverted()
-void I2cDiscreteIoExpander::disableBitwiseInversion()
+/// \sa PCF8575C::enableBitwiseInversion()
+/// \sa PCF8575C::isInverted()
+void PCF8575C::disableBitwiseInversion()
 {
   ports_ = shouldInvert_ ? ~ports_ : ports_;
   shouldInvert_ = false;
@@ -219,7 +219,7 @@ void I2cDiscreteIoExpander::disableBitwiseInversion()
 /// \par Usage:
 /// \code
 /// ...
-/// I2cDiscreteIoExpander device;
+/// PCF8575C device;
 /// ...
 /// if (device.isInverted())
 /// {
@@ -227,9 +227,9 @@ void I2cDiscreteIoExpander::disableBitwiseInversion()
 /// }
 /// ...
 /// \endcode
-/// \sa I2cDiscreteIoExpander::enableBitwiseInversion()
-/// \sa I2cDiscreteIoExpander::disableBitwiseInversion()
-bool I2cDiscreteIoExpander::isInverted()
+/// \sa PCF8575C::enableBitwiseInversion()
+/// \sa PCF8575C::disableBitwiseInversion()
+bool PCF8575C::isInverted()
 {
   return shouldInvert_;
 }
